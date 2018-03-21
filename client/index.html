@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script
+    src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>   
+    
+    <style>
+        #home {
+        height: 100vh;
+        width: auto;
+        cursor: pointer;
+        }
+    </style>
+
+</head>
+<body>
+    <div id="home"></div>
+
+    <input type="text" id="textVal">
+    <button id="message" type="submit">Sumbit</button>
+    <ul class="list">
+        <li>Harusnya masuk sini</li>
+    </ul>
+
+    <script>
+        $(document).keydown(function(e) {
+            switch(e.which) {
+                case 37: {
+                    console.log('left')
+                    addnew('left')
+                    let imgurl = 'https://images2.alphacoders.com/242/2420.jpg'
+                    changeBackground(imgurl);
+                    break;
+                }
+
+                case 38: {
+                    console.log('up')
+                    let imgurl = 'https://pre00.deviantart.net/5a01/th/pre/i/2010/242/3/1/plankton_wallpaer_by_dodgydavec-d2xmgzo.png';
+                    changeBackground(imgurl);              
+                    break;
+                }
+
+                case 39: {
+                    console.log('right')
+                    let imgurl = 'http://wallpaperlepi.com/wp-content/uploads/2014/08/Funny-Patrick-Star-Wallpaper-Android-776.jpg'
+                    changeBackground(imgurl);                            
+                    break;
+                }
+
+                case 40: {
+                    console.log('down')
+                    let imgurl = 'https://i.ytimg.com/vi/pneBKFjxInQ/maxresdefault.jpg';
+                    changeBackground(imgurl);                                            
+                    break;
+                }
+
+                default: return; // exit this handler for other keys
+            }
+            e.preventDefault(); // prevent the default action (scroll / move caret)
+        });
+
+        let socket = io.connect('http://localhost:3000')        
+        let btnMsg = document.querySelector('#message')
+        let inputedtext = document.querySelector('#textVal')
+        let list = document.querySelector('.list')
+
+        function addnew(str) {
+            socket.emit('addlist', {
+                text: str
+            })
+        }
+
+        function changeBackground(url) {
+            socket.emit('change', url);
+        }
+
+        btnMsg.addEventListener('click', () => {
+            socket.emit('addlist', {
+                text: inputedtext.value
+            })
+        })
+        
+        socket.on('welcome', () => {
+            console.log('welcome')
+        })
+        socket.on('addlist', (response) => {
+            let li = document.createElement("li")
+            li.innerHTML = response
+            list.appendChild(li)
+        })
+        socket.on('change', (response) => {
+            $('#home').css('background-image', 'url(' + response + ')');            
+        })
+
+        
+    </script>   
+</body>
+</html>
